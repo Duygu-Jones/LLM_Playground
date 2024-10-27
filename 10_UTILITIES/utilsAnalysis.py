@@ -67,7 +67,8 @@ class UtilsAnalysis:
             print("Lütfen önce bir DataFrame yükleyin.")
             return None
 
-
+        
+   ######################## SELF COLUMN ##############################
     def set_column(self):
         """
         Kullanıcıya mevcut sütunları gösterir ve sütun adını seçmesini ister.
@@ -245,3 +246,24 @@ class UtilsAnalysis:
             print(f"'{column_name}' sütununda sayısal olmayan karakterler bulunamadı.")
             return None
 
+
+  ######################## DATAFRAME'LERIN SUTUN ISIMLERINI KARSILASTIRIR ####################      
+    def create_columns_table(self, *dfs):
+        """
+        Verilen DataFrame'lerin sütun isimlerini tablo halinde gösterir.
+        DataFrame'lere sırasıyla otomatik isim verir.
+        
+        :param dfs: Sırasız olarak verilen DataFrame'ler (örneğin, df1, df2, ...)
+        :return: Sütun isimlerini gösteren bir DataFrame
+        """
+        # Sütun isimlerini bir listede topla
+        column_lists = [df.columns.tolist() for df in dfs]
+        
+        # En uzun sütun listesine göre eksik sütunları doldurmak için her listeyi aynı uzunlukta yap
+        max_len = max(len(cols) for cols in column_lists)
+        column_lists = [cols + [None] * (max_len - len(cols)) for cols in column_lists]
+        
+        # DataFrame'lere otomatik isimler ver (örneğin, df1, df2, ...)
+        col_table = pd.DataFrame({f'df{i+1}': cols for i, cols in enumerate(column_lists)})
+        return col_table       
+        
