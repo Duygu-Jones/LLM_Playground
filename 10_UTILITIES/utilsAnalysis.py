@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import seaborn as sns
 import re
+from datetime import datetime
+import dateparser
+
 
 class UtilsAnalysis:
     def __init__(self):
@@ -276,7 +279,7 @@ class UtilsAnalysis:
         return final_df
 
 
-   #===========================================================================================
+#===========================================================================================
 
     def groupby_get_null_values(self):
         """
@@ -317,4 +320,45 @@ class UtilsAnalysis:
         return final_df
 
 
+#=======================================================================
 
+    def clean_and_standardize_date(self):
+        """
+        Seçilen sütundaki tarihleri temizleyip standart bir formata (YYYY-MM-DD) dönüştürür.
+        """
+        # DataFrame kontrolü
+        if self.df is None:
+            print("Lütfen önce bir DataFrame yükleyin.")
+            return None
+
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen tarihleri temizlemek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
+
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
+            return None
+
+        # Tarih temizleme ve formatlama işlemi
+        def standardize_date(date_string):
+            if pd.isnull(date_string):  # Boş değer kontrolü
+                return None
+
+            # Kelime olarak girilen tarih ifadeleri de dahil olmak üzere tarih formatını analiz et
+            parsed_date = dateparser.parse(date_string)
+            if parsed_date:
+                return parsed_date.strftime("%Y-%m-%d")
+            else:
+                return None
+
+        # Seçilen sütundaki her bir tarihi temizleme ve formatlama
+        self.df[column_name] = self.df[column_name].apply(standardize_date)
+        print(f"'{column_name}' sütunundaki tarihler temizlenmiş ve standart hale getirilmiştir.")
+        
+        # İlk birkaç satırı göstermek için
+        return self.df[[column_name]].head()
