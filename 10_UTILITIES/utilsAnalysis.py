@@ -74,17 +74,29 @@ class UtilsAnalysis:
         """
         Seçilen sütundaki değerlerin sayısını ve yüzde oranlarını döndürür.
         """
+        # DataFrame kontrolü
         if self.df is None:
-            print("Önce bir DataFrame yüklemelisiniz.")
+            print("Lütfen önce bir DataFrame yükleyin.")
             return None
 
-        column_name = self.set_column()
-        if column_name is None:
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen değerlerini görmek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
+
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
             return None
 
+        # Değer sayımları ve yüzdeler
         vc = self.df[column_name].value_counts()
         vc_norm = self.df[column_name].value_counts(normalize=True)
         
+        # DataFrame formatında birleştirme ve düzenleme
         vc = vc.rename_axis(column_name).reset_index(name='counts')
         vc_norm = vc_norm.rename_axis(column_name).reset_index(name='percent')
         vc_norm['percent'] = (vc_norm['percent'] * 100).map('{:.2f}%'.format)
