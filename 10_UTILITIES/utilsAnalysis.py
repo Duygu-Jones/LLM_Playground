@@ -68,31 +68,7 @@ class UtilsAnalysis:
             return None
 
         
-   ######################## SELF COLUMN ##############################
-    def set_column(self):
-        """
-        Kullanıcıya mevcut sütunları gösterir ve sütun adını seçmesini ister.
-        """
-        if self.df is None:
-            print("Önce bir DataFrame yüklemelisiniz.")
-            return None
-
-        # Mevcut sütunları listeleme
-        print("Mevcut sütunlar:")
-        print(" | ".join(self.df.columns))
-
-        # Kullanıcıdan sütun adını alma
-        print("\nLütfen analiz etmek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi', 'siparisi_veren'):")
-        column_name = input("Sütun adı: ")
-
-        # Seçilen sütunun kontrolü
-        if column_name not in self.df.columns:
-            print(f"'{column_name}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
-            return None
-        else:
-            print(f"'{column_name}' sütunu başarıyla seçildi!")
-            return column_name
-
+  
     ######################## VALUE COUNTS ##############################
     def get_value_count(self):
         """
@@ -246,24 +222,80 @@ class UtilsAnalysis:
             print(f"'{column_name}' sütununda sayısal olmayan karakterler bulunamadı.")
             return None
 
+        
+ #================================================================================       
 
-  ######################## DATAFRAME'LERIN SUTUN ISIMLERINI KARSILASTIRIR ####################      
-    def create_columns_table(self, *dfs):
+    def groupby_get_values1(self):
         """
-        Verilen DataFrame'lerin sütun isimlerini tablo halinde gösterir.
-        DataFrame'lere sırasıyla otomatik isim verir.
-        
-        :param dfs: Sırasız olarak verilen DataFrame'ler (örneğin, df1, df2, ...)
-        :return: Sütun isimlerini gösteren bir DataFrame
+        Kullanıcıdan bir grup sütunu ve analiz edilecek sütunları alır,
+        veriyi gruplandırır ve belirtilen sütunlardaki dolu değerlerin özetini DataFrame olarak döndürür.
         """
-        # Sütun isimlerini bir listede topla
-        column_lists = [df.columns.tolist() for df in dfs]
-        
-        # En uzun sütun listesine göre eksik sütunları doldurmak için her listeyi aynı uzunlukta yap
-        max_len = max(len(cols) for cols in column_lists)
-        column_lists = [cols + [None] * (max_len - len(cols)) for cols in column_lists]
-        
-        # DataFrame'lere otomatik isimler ver (örneğin, df1, df2, ...)
-        col_table = pd.DataFrame({f'df{i+1}': cols for i, cols in enumerate(column_lists)})
-        return col_table       
-        
+        # Mevcut sütunları gösterme
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan gruplandırma yapılacak sütunu alma
+        group_column = input("\nLütfen groupby yapılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
+        if group_column not in self.df.columns:
+            print(f"'{group_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
+            return
+
+        # Kullanıcıdan dolu değerleri görmek istediği sütunları virgülle ayırarak alma
+        columns_input = input("\nDeğerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
+        columns = [col.strip() for col in columns_input.split(',')]
+
+        # Geçerli ve geçersiz sütunları ayırt etme
+        valid_columns = [col for col in columns if col in self.df.columns]
+        invalid_columns = [col for col in columns if col not in self.df.columns]
+
+        if invalid_columns:
+            print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
+            return
+
+        # Kategorilere göre her sütundaki dolu değerlerin sayısını hesaplayan DataFrame
+        grouped_df = self.df.groupby(group_column).apply(lambda x: x[valid_columns].notnull().sum())
+
+        # Sonuçları ekrana yazdırma
+        print("\n# Gruplandırılmış DataFrame (Dolu Değerler):\n")
+        return grouped_df
+
+
+    def groupby_get_values(self):
+        """
+        Kullanıcıdan bir index sütunu ve analiz edilecek sütunları alır,
+        veriyi gruplandırır ve belirtilen sütunlardaki dolu değerlerin özetini DataFrame olarak döndürür.
+        """
+        # Mevcut sütunları gösterme
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan gruplandırma yapılacak index sütununu alma
+        index_column = input("\nLütfen groupby yapılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
+        if index_column not in self.df.columns:
+            print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
+            return
+
+        # Kullanıcıdan analiz edilecek sütunları virgülle ayırarak alma
+        columns_input = input("\nDeğerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
+        columns = [col.strip() for col in columns_input.split(',')]
+
+        # Geçerli ve geçersiz sütunları ayırt etme
+        valid_columns = [col for col in columns if col in self.df.columns]
+        invalid_columns = [col for col in columns if col not in self.df.columns]
+
+        # Geçersiz sütunlar varsa kullanıcıyı bilgilendirme
+        if invalid_columns:
+            print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
+            return
+
+        # Kategorilere göre belirtilen sütunlardaki dolu değerlerin sayısını hesaplayan DataFrame
+        grouped_df = self.df.groupby(index_column)[valid_columns].apply(lambda x: x.notnull().sum())
+
+        # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
+        final_df = grouped_df.reset_index()
+
+        # Sonuçları ekrana yazdırma
+        print("\n# Gruplandırılmış DataFrame (Dolu Değerler):\n")
+        return final_df
+
+ 
