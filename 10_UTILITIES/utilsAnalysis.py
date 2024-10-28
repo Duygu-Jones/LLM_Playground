@@ -303,42 +303,43 @@ class UtilsAnalysis:
 #             return final_df
 
 
-def analyze_null_values(self):
-    """
-    Kullanıcıdan bir index sütunu ve analiz edilecek sütunları alır,
-    veriyi gruplandırır ve belirtilen sütunlardaki null değerlerin özetini DataFrame olarak döndürür.
-    """
-    # Mevcut sütunları gösterme
-    print("Mevcut sütunlar:")
-    print(" | ".join(self.df.columns))
+    def analyse_null_values(self):
+        """
+        Kullanıcıdan bir index sütunu ve analiz edilecek sütunları alır,
+        veriyi gruplandırır ve belirtilen sütunlardaki null değerlerin özetini DataFrame olarak döndürür.
+        """
+        # Mevcut sütunları gösterme
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
 
-    # Kullanıcıdan gruplandırma yapılacak index sütununu alma
-    index_column = input("\nLütfen index olarak kullanılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
-    if index_column not in self.df.columns:
-        print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
-        return
+        # Kullanıcıdan gruplandırma yapılacak index sütununu alma
+        index_column = input("\nLütfen index olarak kullanılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
+        if index_column not in self.df.columns:
+            print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
+            return
 
-    # Kullanıcıdan analiz edilecek sütunları virgülle ayırarak alma
-    columns_input = input("\nNull değerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
-    columns = [col.strip() for col in columns_input.split(',')]
+        # Kullanıcıdan analiz edilecek sütunları virgülle ayırarak alma
+        columns_input = input("\nNull değerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
+        columns = [col.strip() for col in columns_input.split(',')]
 
-    # Geçerli ve geçersiz sütunları ayırt etme
-    valid_columns = [col for col in columns if col in self.df.columns]
-    invalid_columns = [col for col in columns if col not in self.df.columns]
+        # Geçerli ve geçersiz sütunları ayırt etme
+        valid_columns = [col for col in columns if col in self.df.columns]
+        invalid_columns = [col for col in columns if col not in self.df.columns]
 
-    # Geçersiz sütunlar varsa kullanıcıyı bilgilendirme
-    if invalid_columns:
-        print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
-        return
+        # Geçersiz sütunlar varsa kullanıcıyı bilgilendirme
+        if invalid_columns:
+            print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
+            return
 
-    # Kategorilere göre her sütundaki null değerlerin sayısını hesaplayan DataFrame
-    grouped_df = self.df.groupby(index_column)[valid_columns].apply(lambda x: x.isnull().sum())
+        # Kategorilere göre her sütundaki null değerlerin sayısını hesaplayan DataFrame
+        grouped_df = self.df.groupby(index_column)[valid_columns].apply(lambda x: x.isnull().sum())
 
-    # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
-    final_df = grouped_df.reset_index()
+        # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
+        final_df = grouped_df.reset_index()
 
-    # Sonuçları ekrana yazdırma
-    print("\n# Gruplandırılmış DataFrame (Null Değerler):\n")
-    print(final_df)
+        # Sonuçları ekrana yazdırma
+        print("\n# Gruplandırılmış DataFrame (Null Değerler):\n")
+        return final_df
 
-    return final_df
+
+
