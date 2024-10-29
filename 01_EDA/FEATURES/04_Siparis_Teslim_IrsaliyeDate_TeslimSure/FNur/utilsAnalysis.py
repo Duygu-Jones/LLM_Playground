@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import seaborn as sns
 import re
+from datetime import datetime
+import dateparser
+
 
 class UtilsAnalysis:
     def __init__(self):
@@ -74,17 +77,29 @@ class UtilsAnalysis:
         """
         Seçilen sütundaki değerlerin sayısını ve yüzde oranlarını döndürür.
         """
+        # DataFrame kontrolü
         if self.df is None:
-            print("Önce bir DataFrame yüklemelisiniz.")
+            print("Lütfen önce bir DataFrame yükleyin.")
             return None
 
-        column_name = self.set_column()
-        if column_name is None:
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen değerlerini görmek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
+
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
             return None
 
+        # Değer sayımları ve yüzdeler
         vc = self.df[column_name].value_counts()
         vc_norm = self.df[column_name].value_counts(normalize=True)
         
+        # DataFrame formatında birleştirme ve düzenleme
         vc = vc.rename_axis(column_name).reset_index(name='counts')
         vc_norm = vc_norm.rename_axis(column_name).reset_index(name='percent')
         vc_norm['percent'] = (vc_norm['percent'] * 100).map('{:.2f}%'.format)
@@ -263,82 +278,87 @@ class UtilsAnalysis:
         print("\n# Gruplandırılmış DataFrame (Dolu Değerler):\n")
         return final_df
 
- #=========================================================================
-#     def analyze_null_values(self):
-#             """
-#             Kullanıcıdan index sütunu ve analiz edilecek sütunları alır,
-#             veriyi gruplandırır ve null değerlerin özetini DataFrame olarak döndürür.
-#             """
-#             # Mevcut sütunları gösterme
-#             print("Mevcut sütunlar:")
-#             print(" | ".join(self.df.columns))
 
-#             # Kullanıcıdan index sütununu alma
-#             index_column = input("\nLütfen index olarak kullanılacak sütunu seçiniz: ")
-#             if index_column not in self.df.columns:
-#                 print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
-#                 return
+#===========================================================================================
 
-#             # Kullanıcıdan analiz edilecek sütunları alma
-#             columns_input = input("\nAnaliz edilecek sütunları virgülle ayırarak giriniz: ")
-#             columns = [col.strip() for col in columns_input.split(',')]
+    def groupby_get_null_values(self):
+        """
+        Kullanıcıdan bir index sütunu ve analiz edilecek sütunları alır,
+        veriyi gruplandırır ve belirtilen sütunlardaki null değerlerin özetini DataFrame olarak döndürür.
+        """
+        # Mevcut sütunları gösterme
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
 
-#             # Geçerli ve geçersiz sütunları ayırt etme
-#             valid_columns = [col for col in columns if col in self.df.columns]
-#             invalid_columns = [col for col in columns if col not in self.df.columns]
+        # Kullanıcıdan gruplandırma yapılacak index sütununu alma
+        index_column = input("\nLütfen index olarak kullanılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
+        if index_column not in self.df.columns:
+            print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
+            return
 
-#             if invalid_columns:
-#                 print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
-#                 return
+        # Kullanıcıdan analiz edilecek sütunları virgülle ayırarak alma
+        columns_input = input("\nNull değerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
+        columns = [col.strip() for col in columns_input.split(',')]
 
-#             # Kategorilere göre her sütundaki dolu değerlerin sayısını hesaplayan DataFrame
-#             grouped_df = self.df.groupby(index_column).apply(lambda x: x.notnull().sum())
+        # Geçerli ve geçersiz sütunları ayırt etme
+        valid_columns = [col for col in columns if col in self.df.columns]
+        invalid_columns = [col for col in columns if col not in self.df.columns]
 
-#             # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
-#             final_df = grouped_df[[index_column] + valid_columns]
+        # Geçersiz sütunlar varsa kullanıcıyı bilgilendirme
+        if invalid_columns:
+            print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
+            return
 
-#             print("\n# Gruplandırılmış VeriFrame (Dolu Değerler):\n")
-#             print(final_df)
+        # Kategorilere göre her sütundaki null değerlerin sayısını hesaplayan DataFrame
+        grouped_df = self.df.groupby(index_column)[valid_columns].apply(lambda x: x.isnull().sum())
 
-#             return final_df
+        # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
+        final_df = grouped_df.reset_index()
+
+        # Sonuçları ekrana yazdırma
+        print("\n# Gruplandırılmış DataFrame (Null Değerler):\n")
+        return final_df
 
 
-def analyze_null_values(self):
-    """
-    Kullanıcıdan bir index sütunu ve analiz edilecek sütunları alır,
-    veriyi gruplandırır ve belirtilen sütunlardaki null değerlerin özetini DataFrame olarak döndürür.
-    """
-    # Mevcut sütunları gösterme
-    print("Mevcut sütunlar:")
-    print(" | ".join(self.df.columns))
+#=======================================================================
 
-    # Kullanıcıdan gruplandırma yapılacak index sütununu alma
-    index_column = input("\nLütfen index olarak kullanılacak sütunu seçiniz (örneğin: kategori, teslim_tarihi vb.): ")
-    if index_column not in self.df.columns:
-        print(f"'{index_column}' sütunu mevcut değil. Lütfen geçerli bir sütun adı girin.")
-        return
+    def clean_and_standardize_date(self):
+        """
+        Seçilen sütundaki tarihleri temizleyip standart bir formata (YYYY-MM-DD) dönüştürür.
+        """
+        # DataFrame kontrolü
+        if self.df is None:
+            print("Lütfen önce bir DataFrame yükleyin.")
+            return None
 
-    # Kullanıcıdan analiz edilecek sütunları virgülle ayırarak alma
-    columns_input = input("\nNull değerlerini görmek istediğiniz diğer sütunları virgülle ayırarak giriniz (örneğin: fiyat, adet, tarih): ")
-    columns = [col.strip() for col in columns_input.split(',')]
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
 
-    # Geçerli ve geçersiz sütunları ayırt etme
-    valid_columns = [col for col in columns if col in self.df.columns]
-    invalid_columns = [col for col in columns if col not in self.df.columns]
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen tarihleri temizlemek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
 
-    # Geçersiz sütunlar varsa kullanıcıyı bilgilendirme
-    if invalid_columns:
-        print(f"\nGeçersiz sütunlar: {', '.join(invalid_columns)}")
-        return
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
+            return None
 
-    # Kategorilere göre her sütundaki null değerlerin sayısını hesaplayan DataFrame
-    grouped_df = self.df.groupby(index_column)[valid_columns].apply(lambda x: x.isnull().sum())
+        # Tarih temizleme ve formatlama işlemi
+        def standardize_date(date_string):
+            if pd.isnull(date_string):  # Boş değer kontrolü
+                return None
 
-    # Sadece belirtilen sütunlar ve index sütununu içeren bir DataFrame oluşturma
-    final_df = grouped_df.reset_index()
+            # Kelime olarak girilen tarih ifadeleri de dahil olmak üzere tarih formatını analiz et
+            parsed_date = dateparser.parse(date_string)
+            if parsed_date:
+                return parsed_date.strftime("%Y-%m-%d")
+            else:
+                return None
 
-    # Sonuçları ekrana yazdırma
-    print("\n# Gruplandırılmış DataFrame (Null Değerler):\n")
-    print(final_df)
-
-    return final_df
+        # Seçilen sütundaki her bir tarihi temizleme ve formatlama
+        self.df[column_name] = self.df[column_name].apply(standardize_date)
+        print(f"'{column_name}' sütunundaki tarihler temizlenmiş ve standart hale getirilmiştir.")
+        
+        # İlk birkaç satırı göstermek için
+        return self.df[[column_name]].head()
