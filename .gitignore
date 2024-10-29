@@ -2,3 +2,21 @@
 /wother
 .DS_Store
 DS_Store
+/10_UTILITIES/__pycache__
+/10_UTILITIES/__pycache__
+/10_UTILITIES/__pycache__
+/.ipynb_checkpoints
+/__pycache__
+
+# Tüm checkpoint dosyalarını göz ardı et
+*.checkpoint
+
+# __pycache__ klasörlerini göz ardı et
+__pycache__/
+
+# .ipynb_checkpoints klasörlerini göz ardı et (Jupyter Notebook)
+.ipynb_checkpoints/
+
+# Diğer checkpoint dosyalarını göz ardı et
+*.ckpt
+/01_EDA/FEATURES/04_Siparis_Teslim_IrsaliyeDate_TeslimSure/Duygu/.ipynb_checkpoints

@@ -2,6 +2,9 @@ import os
 import pandas as pd
 import seaborn as sns
 import re
+from datetime import datetime
+import dateparser
+
 
 class UtilsAnalysis:
     def __init__(self):
@@ -74,17 +77,29 @@ class UtilsAnalysis:
         """
         Seçilen sütundaki değerlerin sayısını ve yüzde oranlarını döndürür.
         """
+        # DataFrame kontrolü
         if self.df is None:
-            print("Önce bir DataFrame yüklemelisiniz.")
+            print("Lütfen önce bir DataFrame yükleyin.")
             return None
 
-        column_name = self.set_column()
-        if column_name is None:
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen değerlerini görmek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
+
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
             return None
 
+        # Değer sayımları ve yüzdeler
         vc = self.df[column_name].value_counts()
         vc_norm = self.df[column_name].value_counts(normalize=True)
         
+        # DataFrame formatında birleştirme ve düzenleme
         vc = vc.rename_axis(column_name).reset_index(name='counts')
         vc_norm = vc_norm.rename_axis(column_name).reset_index(name='percent')
         vc_norm['percent'] = (vc_norm['percent'] * 100).map('{:.2f}%'.format)
@@ -264,7 +279,7 @@ class UtilsAnalysis:
         return final_df
 
 
-   #===========================================================================================
+#===========================================================================================
 
     def groupby_get_null_values(self):
         """
@@ -305,4 +320,45 @@ class UtilsAnalysis:
         return final_df
 
 
+#=======================================================================
 
+    def clean_and_standardize_date(self):
+        """
+        Seçilen sütundaki tarihleri temizleyip standart bir formata (YYYY-MM-DD) dönüştürür.
+        """
+        # DataFrame kontrolü
+        if self.df is None:
+            print("Lütfen önce bir DataFrame yükleyin.")
+            return None
+
+        # Mevcut sütunları listeleme (yatay format)
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan sütun adını alma
+        print("\nLütfen tarihleri temizlemek istediğiniz sütun adını yazınız (örn: 'siparis_tarihi'):")
+        column_name = input("Sütun adı: ").strip()
+
+        # Sütun kontrolü
+        if column_name not in self.df.columns:
+            print(f"'{column_name}' sütunu mevcut değil.")
+            return None
+
+        # Tarih temizleme ve formatlama işlemi
+        def standardize_date(date_string):
+            if pd.isnull(date_string):  # Boş değer kontrolü
+                return None
+
+            # Kelime olarak girilen tarih ifadeleri de dahil olmak üzere tarih formatını analiz et
+            parsed_date = dateparser.parse(date_string)
+            if parsed_date:
+                return parsed_date.strftime("%Y-%m-%d")
+            else:
+                return None
+
+        # Seçilen sütundaki her bir tarihi temizleme ve formatlama
+        self.df[column_name] = self.df[column_name].apply(standardize_date)
+        print(f"'{column_name}' sütunundaki tarihler temizlenmiş ve standart hale getirilmiştir.")
+        
+        # İlk birkaç satırı göstermek için
+        return self.df[[column_name]].head()
