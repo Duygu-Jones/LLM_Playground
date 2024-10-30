@@ -20,3 +20,4 @@ __pycache__/
 # Diğer checkpoint dosyalarını göz ardı et
 *.ckpt
 /01_EDA/FEATURES/04_Siparis_Teslim_IrsaliyeDate_TeslimSure/Duygu/.ipynb_checkpoints
+/01_EDA/FEATURES/04_Siparis_Teslim_IrsaliyeDate_TeslimSure/Duygu/.ipynb_checkpoints
