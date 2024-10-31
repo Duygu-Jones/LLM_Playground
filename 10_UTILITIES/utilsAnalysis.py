@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 import re
 from datetime import datetime
+from datetime import timedelta
 import dateparser
 
 
@@ -362,3 +363,65 @@ class UtilsAnalysis:
         
         # İlk birkaç satırı göstermek için
         return self.df[[column_name]].head()
+
+    
+    
+#===========================DATE CALCULATION =============================    
+    def calculate_date_operation(self, index):
+        """
+        Belirli bir indeksli satırda, belirtilen sütunlara göre tarih hesaplaması yapar (toplama veya çıkarma).
+        
+        :param index: İşlem yapılacak satırın indeksi
+        """
+        # DataFrame kontrolü
+        if self.df is None:
+            print("Lütfen önce bir DataFrame yükleyin.")
+            return None
+
+        # Mevcut sütunları listeleme
+        print("Mevcut sütunlar:")
+        print(" | ".join(self.df.columns))
+
+        # Kullanıcıdan hedef sütun adını alma
+        target_column = input("Lütfen doldurulacak sütun adını yazınız (örn: 'teslim_tarihi'): ").strip()
+
+        # Kullanıcıdan başlangıç tarih sütununu alma
+        base_column = input("İşlem yapılacak başlangıç tarih sütun adını yazınız (örn: 'siparis_tarihi'): ").strip()
+
+        # Kullanıcıdan gün sayısı içeren sütun adını alma
+        days_column = input("Gün sayısını içeren sütun adını yazınız (örn: 'teslim_suresi'): ").strip()
+
+        # Kullanıcıdan yapılacak işlemi seçme
+        operation = input("Toplama yapmak için '+' yazın, çıkarma yapmak için '-' yazın: ").strip()
+
+        # Belirtilen indeksli satırın verilerini al
+        row = self.df.loc[index]
+
+        # Gerekli sütunların dolu olup olmadığını kontrol et
+        if pd.notnull(row[base_column]) and pd.notnull(row[days_column]):
+            # Başlangıç tarihini al ve datetime formatına çevir (eğer değilse)
+            base_date = pd.to_datetime(row[base_column], errors='coerce')
+
+            # base_date hala NaT ise, hata mesajı ver
+            if pd.isnull(base_date):
+                print(f"{base_column} sütunu geçerli bir tarih formatında değil.")
+                return None
+
+            # Gün sayısını al
+            days_value = int(row[days_column].split()[0])
+
+            # İşlemi gerçekleştir
+            if operation == '+':
+                calculated_date = base_date + timedelta(days=days_value)
+            elif operation == '-':
+                calculated_date = base_date - timedelta(days=days_value)
+            else:
+                print("Geçersiz işlem seçildi. Lütfen '+' veya '-' girin.")
+                return None
+
+            # Hedef sütundaki değeri güncelle
+            self.df.at[index, target_column] = calculated_date
+
+            print(f"{index} indeksindeki '{target_column}' sütunu başarıyla hesaplandı: {calculated_date}")
+        else:
+            print(f"{index} indeksinde '{base_column}' veya '{days_column}' eksik.")
