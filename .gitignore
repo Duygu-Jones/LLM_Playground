@@ -21,3 +21,4 @@ __pycache__/
 *.ckpt
 /01_EDA/FEATURES/04_Siparis_Teslim_IrsaliyeDate_TeslimSure/Duygu/.ipynb_checkpoints
 /01_EDA/FEATURES/04_Siparis_Teslim_IrsaliyeDate_TeslimSure/Duygu/.ipynb_checkpoints
+/10_UTILITIES/__pycache__
