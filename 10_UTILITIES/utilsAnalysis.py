@@ -369,8 +369,8 @@ class UtilsAnalysis:
 #===========================DATE CALCULATION =============================    
     def calculate_date_operation(self, index):
         """
-        Belirli bir indeksli satırda, belirtilen sütunlara göre tarih hesaplaması yapar (toplama, çıkarma veya gün farkı).
-        
+        Belirli bir indeksli satırda, sipariş, teslim tarihi veya teslim süresi üzerinden eksik veriyi hesaplar.
+
         :param index: İşlem yapılacak satırın indeksi
         """
         # DataFrame kontrolü
@@ -378,67 +378,41 @@ class UtilsAnalysis:
             print("Lütfen önce bir DataFrame yükleyin.")
             return None
 
-        # Mevcut sütunları listeleme
-        print("Mevcut sütunlar:")
-        print(" | ".join(self.df.columns))
+        # Belirtilen indeksli satırın verilerini al
+        row = self.df.loc[index]
 
-        # Kullanıcıdan hedef sütun adını alma
-        target_column = input("Lütfen doldurulacak sütun adını yazınız (örn: 'teslim_tarihi' veya 'teslim_suresi'): ").strip()
+        # Gerekli sütunların doluluğunu kontrol et
+        siparis_tarihi = pd.to_datetime(row['siparis_tarihi'], errors='coerce')
+        teslim_tarihi = pd.to_datetime(row['teslim_tarihi'], errors='coerce')
+        teslim_suresi = row['teslim_suresi']
 
-        # Kullanıcıdan başlangıç tarih sütununu alma
-        base_column = input("İşlem yapılacak başlangıç tarih sütun adını yazınız (örn: 'siparis_tarihi'): ").strip()
+        # 1. Eğer siparis_tarihi ve teslim_tarihi varsa, teslim_suresi'ni gün farkı olarak hesapla
+        if pd.notnull(siparis_tarihi) and pd.notnull(teslim_tarihi) and pd.isnull(teslim_suresi):
+            day_difference = (teslim_tarihi - siparis_tarihi).days
+            self.df.at[index, 'teslim_suresi'] = day_difference
+            print(f"{index} indeksindeki 'teslim_suresi' sütunu gün farkı olarak ayarlandı: {day_difference} gün")
 
-        # İşlem türüne göre ek sütun ya da gün sayısı sütunu alma
-        operation_type = input("Tarih hesaplaması (bir tarihe gün ekleme/çıkarma) veya gün farkı hesaplama için 'tarih' veya 'fark' girin: ").strip().lower()
+        # 2. Eğer siparis_tarihi ve teslim_suresi varsa, teslim_tarihi'ni hesapla
+        elif pd.notnull(siparis_tarihi) and pd.notnull(teslim_suresi) and pd.isnull(teslim_tarihi):
+            try:
+                days_value = int(str(teslim_suresi).split()[0])  # Eğer teslim_suresi '10 gün' gibi bir formatta ise
+                calculated_date = siparis_tarihi + timedelta(days=days_value)
+                self.df.at[index, 'teslim_tarihi'] = calculated_date
+                print(f"{index} indeksindeki 'teslim_tarihi' sütunu hesaplandı: {calculated_date}")
+            except ValueError:
+                print(f"{index} indeksinde 'teslim_suresi' sayısal bir değer içermiyor veya yanlış formatta.")
 
-        # İşlem türü kontrolü
-        if operation_type == 'tarih':
-            days_column = input("Gün sayısını içeren sütun adını yazınız (örn: 'teslim_suresi'): ").strip()
-            operation = input("Toplama yapmak için '+' yazın, çıkarma yapmak için '-' yazın: ").strip()
+        # 3. Eğer teslim_tarihi ve teslim_suresi varsa, siparis_tarihi'ni hesapla
+        elif pd.notnull(teslim_tarihi) and pd.notnull(teslim_suresi) and pd.isnull(siparis_tarihi):
+            try:
+                days_value = int(str(teslim_suresi).split()[0])  # Eğer teslim_suresi '10 gün' gibi bir formatta ise
+                calculated_date = teslim_tarihi - timedelta(days=days_value)
+                self.df.at[index, 'siparis_tarihi'] = calculated_date
+                print(f"{index} indeksindeki 'siparis_tarihi' sütunu hesaplandı: {calculated_date}")
+            except ValueError:
+                print(f"{index} indeksinde 'teslim_suresi' sayısal bir değer içermiyor veya yanlış formatta.")
 
-            # Belirtilen indeksli satırın verilerini al
-            row = self.df.loc[index]
-
-            # Gerekli sütunların dolu olup olmadığını kontrol et
-            if pd.notnull(row[base_column]) and pd.notnull(row[days_column]):
-                base_date = pd.to_datetime(row[base_column], errors='coerce')
-                days_value = int(row[days_column].split()[0])
-
-                # İşlemi gerçekleştir
-                if operation == '+':
-                    calculated_date = base_date + timedelta(days=days_value)
-                elif operation == '-':
-                    calculated_date = base_date - timedelta(days=days_value)
-                else:
-                    print("Geçersiz işlem seçildi. Lütfen '+' veya '-' girin.")
-                    return None
-
-                # Hedef sütundaki değeri güncelle
-                self.df.at[index, target_column] = calculated_date
-                print(f"{index} indeksindeki '{target_column}' sütunu başarıyla hesaplandı: {calculated_date}")
-
-            else:
-                print(f"{index} indeksinde '{base_column}' veya '{days_column}' eksik.")
-
-        elif operation_type == 'fark':
-            end_column = input("Bitiş tarih sütununu yazınız (örn: 'teslim_tarihi'): ").strip()
-
-            # Belirtilen indeksli satırın verilerini al
-            row = self.df.loc[index]
-
-            # Gerekli sütunların dolu olup olmadığını kontrol et
-            if pd.notnull(row[base_column]) and pd.notnull(row[end_column]):
-                base_date = pd.to_datetime(row[base_column], errors='coerce')
-                end_date = pd.to_datetime(row[end_column], errors='coerce')
-
-                # Gün farkını hesapla
-                day_difference = (end_date - base_date).days
-
-                # Hedef sütundaki değeri gün farkı olarak güncelle
-                self.df.at[index, target_column] = day_difference
-                print(f"{index} indeksindeki '{target_column}' sütunu başarıyla hesaplandı: {day_difference} gün")
-
-            else:
-                print(f"{index} indeksinde '{base_column}' veya '{end_column}' eksik.")
+        # 4. Eğer yeterli bilgi yoksa, kullanıcıya bilgi ver
         else:
-            print("Geçersiz işlem türü seçildi. Lütfen 'tarih' veya 'fark' girin.")
+            print(f"{index} indeksinde yeterli veri yok veya tüm veriler mevcut. İşlem yapılamadı.")
+
