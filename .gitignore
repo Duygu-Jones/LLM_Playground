@@ -1,0 +1,60 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# VSCode
+.vscode/
+
+# Streamlit specific
+.streamlit/
+
+# Checkpoints
+*.ckpt
+*.checkpoint
+
+# PyCharm
+.idea/
+
+# General sensitive files
+*.secret
+*.secrets
+*.key
+*.pem
+*.cert
+*.toml
+
+# Logs and temporary files
+*.log
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Vector DB and index files
+*.sqlite3
+.chroma/
+chroma_db/
+.faiss/
+*.faiss
+index.faiss
+index.pkl
+
+
+# Video files
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mpeg
+*.mpg
+
+# Zip files
+*.zip
