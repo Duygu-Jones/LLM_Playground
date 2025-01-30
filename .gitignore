@@ -7,6 +7,11 @@ ENV/
 env.bak/
 venv.bak/
 
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
 # VSCode
 .vscode/
 
@@ -58,3 +63,17 @@ index.pkl
 
 # Zip files
 *.zip
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
