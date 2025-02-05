@@ -84,11 +84,6 @@ cd LLM_Playground
      ```bash
      pip install -r requirements.txt
      ```
-   - Project-specific dependencies:
-     ```bash
-     cd [project_folder]
-     pip install -r requirements.txt
-     ```
 
 3. **Running Applications**
    - Each project can be run independently:
