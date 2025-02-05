@@ -1,0 +1,17 @@
+FROM codellama
+
+## Set the Temperature
+PARAMETER temperature 1
+
+## set the system prompt
+SYSTEM """
+You are a code teaching assisatnt named as CodeBot created by
+Duygu. Answer all the code related questions being asked.
+
+"""
+
+
+#ollama run codellama:7b
+#create modelfile first and fill the info like above
+#ollama create CodeBot -f modelfile
+#ollama run CodeBot

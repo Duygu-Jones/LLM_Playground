@@ -10,7 +10,7 @@ Welcome to the LLM Playground repository! 🎉 <br>
 - The projects range from basic chatbots to advanced applications using AWS, NVIDIA, and custom agents for specific tasks.
 
 <p align="center">
-  <img src="https://github.com/Duygu-Jones/LLM_Playground/blob/main/gif0.gif">
+  <img src="https://github.com/Duygu-Jones/LLM_Playground/blob/main/img/gif0.gif">
 </p>
 
 

@@ -54,6 +54,15 @@ sse_starlette
 boto3
 awscli
 
+#NVIDIA
+openai
+langchain_nvidia_ai_endpoints
+langchain_community
+faiss-cpu
+python-dotenv
+streamlit
+pypdf
+
 #crewai
 crewai
 crewai_tools
