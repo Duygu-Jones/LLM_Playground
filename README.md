@@ -5,8 +5,8 @@
 
 Welcome to the LLM Playground repository! 🎉 <br>
 
-- This repository provides a hands-on collection of practical LLM applications, including chatbots, AI agents, and RAG implementations. 
-- You'll find examples of model fine-tuning, vector databases, and various LLM integrations using tools like LangChain, CrewAI, and OpenAI. 
+- This repository provides a hands-on collection of practical LLM applications, including chatbots, AI agents, SQL and RAG implementations. 
+- You'll find examples of model fine-tuning, vector databases, and various LLM integrations using tools like LangChain, CrewAI, and OpenAI more. 
 - The projects range from basic chatbots to advanced applications using AWS, NVIDIA, and custom agents for specific tasks.
 
 <p align="center">
@@ -103,7 +103,7 @@ Contributions are welcome! If you have improvements or additional examples to sh
 3. Submit a pull request
 
 ## 🌱 About Me 
-I'm Duygu Jones, a Chief AI Engineer passionate about LLMs and AI applications.
+I'm Duygu Jones, a Machine Learning/AI Engineer passionate about LLMs and AI applications.
 
 ♻️ Connect with me:
 - **LinkedIn**: [Linkedin/duygujones](https://www.linkedin.com/in/duygujones/)
@@ -113,8 +113,6 @@ I'm Duygu Jones, a Chief AI Engineer passionate about LLMs and AI applications.
 - **Medium**: [medium.com/@duygujones](https://medium.com/@duygujones)
 
 💫 If you find this repository helpful, please give it a ⭐ star!
-
-Build amazing AI applications! 🤖✨
 
 ---
 ##### 📜 License
