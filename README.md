@@ -4,6 +4,7 @@
 </h1>
 
 Welcome to the LLM Playground repository! 🎉 <br>
+I've documented my step-by-step experiments with LLMs, exploring various frameworks and platforms through practical implementations.<br>
 
 - This repository provides a hands-on collection of practical LLM applications, including chatbots, AI agents, SQL and RAG implementations. 
 - You'll find examples of model fine-tuning, vector databases, and various LLM integrations using tools like LangChain, CrewAI, and OpenAI more. 
@@ -20,14 +21,14 @@ Welcome to the LLM Playground repository! 🎉 <br>
   - OpenAI & ChatGPT
   - Groq (Gemma Models)
   - HuggingFace Models
-  - NVIDIA NIM
-  - AWS Bedrock & SageMaker
   - Codellama & Gradio
   - CrewAI Agents
+  - NVIDIA NIM
+  - AWS Bedrock & SageMaker Integration
 - Advanced features like:
   - Vector embeddings & FAISS
   - RAG (Retrieval Augmented Generation)
-  - Fine-tuning & Quantization
+  - Hybrid Search
   - Database integrations
   - LCEL (LangChain Expression Language)
   - LangGraph implementations
@@ -36,10 +37,10 @@ Welcome to the LLM Playground repository! 🎉 <br>
 - Basic to advanced chatbot implementations
 - Text summarization and Q&A systems
 - Integration with various databases:
-  - SQL & PostgreSQL
-  - Vector DBs (ChromaDB, GraphDB)
-  - AstraDB & MongoDB
-- Mathematical and scientific computing with LLMs
+  - SQL & SQLite
+  - Vector DBs (ChromaDB, FAISS, GraphDB, Pinecone)
+  - AstraDB
+- Mathematical computing with LLMs
 - Hybrid search implementations
 - AWS and Cloud integrations
 - Graph-based LLM applications
@@ -48,15 +49,14 @@ Welcome to the LLM Playground repository! 🎉 <br>
   - RAG Paper QA
   - Multi-agent conversations
 - Advanced optimization:
-  - Quantization techniques
   - Fine-tuning methods
   - Performance optimization
  
 
 ## 📁 Each project folder contains:
-- **app.py**: Streamlit application file
+- **app.py**: Streamlit/Gradio application file
 - **notebook.ipynb**: Detailed Jupyter notebook with explanations
-- **demo.png**: Application screenshot/demo image
+- **UI.png**: Application screenshot/demo image
 - **requirements.txt**: Project-specific dependencies
 
 
