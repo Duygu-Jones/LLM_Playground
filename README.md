@@ -3,7 +3,7 @@
   🌱 Exploring Language Models & Chatbots
 </h1>
 
-Welcome to the LLM Playground repository! 🎉 <br>
+Welcome to the LLM Playground repository!🎉 <br>
 I've documented my step-by-step experiments with LLMs, exploring various frameworks and platforms through practical implementations.<br>
 
 - This repository provides a hands-on collection of practical LLM applications, including chatbots, AI agents, SQL and RAG implementations. 
